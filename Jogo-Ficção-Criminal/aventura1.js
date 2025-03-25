@@ -1,51 +1,64 @@
-let chancesA1 = 3; // Número de chances disponíveis
-let correctAnsweredPagesA1 = new Set(); // Conjunto para rastrear páginas já respondidas corretamente
+let chances = 3; // Número de chances disponíveis
+let correctAnsweredPages = new Set(); // Conjunto para rastrear páginas já respondidas corretamente
 
 // Função para lidar com a resposta da página 4
 function handleAnswer(answer) {
     const currentPage = 'adventure1-page-4';
 
-    if (correctAnsweredPagesA1.has(currentPage)) return;
+
+    // Se a página já foi respondida corretamente, não faz mais nada
+    if (correctAnsweredPages.has(currentPage)) return;
 
     const messageContainer = document.createElement('div');
     messageContainer.style.marginTop = '20px';
     messageContainer.style.textAlign = 'center';
     messageContainer.style.color = 'white';
-    messageContainer.style.backgroundColor = '#343031';
+    messageContainer.style.backgroundColor = '#343031'; // Fundo igual aos botões
     messageContainer.style.padding = '10px';
     messageContainer.style.borderRadius = '5px';
     messageContainer.style.maxWidth = '80%';
     messageContainer.style.margin = '20px auto';
 
     const questionButtons = document.querySelectorAll('#adventure1-page-4 .question-buttons button');
-    questionButtons.forEach((button) => button.classList.remove('wrong', 'correct'));
+
+    // Remove classes de todos os botões antes de aplicar a nova classe
+    questionButtons.forEach((button) => {
+        button.classList.remove('wrong', 'correct');
+    });
 
     if (answer === 'wrong') {
-        chancesA1--; // Corrigido para usar chancesA1
-        messageContainer.innerHTML = `<p>Resposta errada!</p><p>Você perdeu uma chance. Restam ${chancesA1} chances.</p>`;
+        chances--; // Reduz uma chance
+        messageContainer.innerHTML = `<p>Resposta errada!</p><p>Você perdeu uma chance. Restam ${chances} chances.</p>`;
         document.getElementById('adventure1-page-4').appendChild(messageContainer);
 
+        // Marca o botão errado como vermelho
         questionButtons.forEach((button) => {
             if (button.innerText.startsWith('A)')) {
                 button.classList.add('wrong');
             }
         });
 
-        if (chancesA1 === 0) {
-            showGameOver("adventure1");
+        if (chances === 0) {
+            alert('Você atingiu o número máximo de chances. Voltando para a tela inicial.');
+            chances = 3; // Reseta as chances
+            goBackToAdventure(); // Volta para a tela inicial
         }
-        
     } else if (answer === 'correct') {
-        correctAnsweredPagesA1.add(currentPage);
-        messageContainer.innerHTML = `<p>Resposta correta!</p><p>A janela foi quebrada de dentro para fora.</p>`;
+        correctAnsweredPages.add(currentPage); // Marca a página como respondida corretamente
+        messageContainer.innerHTML = `
+            <p>Resposta correta!</p>
+            <p>A janela foi quebrada de dentro para fora, o que significa que o assassino já estava dentro da casa.</p>
+        `;
         document.getElementById('adventure1-page-4').appendChild(messageContainer);
 
+        // Marca o botão correto como verde
         questionButtons.forEach((button) => {
             if (button.innerText.startsWith('B)')) {
                 button.classList.add('correct');
             }
         });
 
+        // Cria o botão "Avançar" e o adiciona abaixo da mensagem
         const nextButton = document.createElement('button');
         nextButton.innerText = 'Avançar';
         nextButton.style.marginTop = '10px';
@@ -53,15 +66,21 @@ function handleAnswer(answer) {
         nextButton.style.fontSize = '1rem';
         nextButton.style.border = 'none';
         nextButton.style.borderRadius = '5px';
-        nextButton.style.backgroundColor = '#4caf50';
+        nextButton.style.backgroundColor = '#4caf50'; // Verde
         nextButton.style.color = 'white';
         nextButton.style.cursor = 'pointer';
-        nextButton.onclick = () => goToPage('adventure1-page-4', 'adventure1-page-5');
+        nextButton.onclick = () => {
+            resetQuestionButtons('adventure1-page-5'); // Reseta os botões da página 5 antes de ir para ela
+            goToPage('adventure1-page-4', 'adventure1-page-5');
+        };
         messageContainer.appendChild(nextButton);
     }
 
+    // Remove a mensagem após 5 segundos (apenas se não for a resposta correta)
     if (answer !== 'correct') {
-        setTimeout(() => messageContainer.remove(), 5000);
+        setTimeout(() => {
+            messageContainer.remove();
+        }, 5000);
     }
 }
 
@@ -70,7 +89,7 @@ function handleAnswerPage5(answer) {
     const currentPage = 'adventure1-page-5';
 
     // Se a página já foi respondida corretamente, não faz mais nada
-    if (correctAnsweredPagesA1.has(currentPage)) return;
+    if (correctAnsweredPages.has(currentPage)) return;
 
     const messageContainer = document.createElement('div');
     messageContainer.style.marginTop = '20px';
@@ -90,8 +109,8 @@ function handleAnswerPage5(answer) {
     });
 
     if (answer === 'wrong') {
-        chancesA1 --; // Reduz uma chance
-        messageContainer.innerHTML = `<p>Resposta errada!</p><p>Você perdeu uma chance. Restam ${chancesA1} chances.</p>`;
+        chances--; // Reduz uma chance
+        messageContainer.innerHTML = `<p>Resposta errada!</p><p>Você perdeu uma chance. Restam ${chances} chances.</p>`;
         document.getElementById(currentPage).appendChild(messageContainer);
 
         // Marca o botão errado como vermelho
@@ -101,12 +120,13 @@ function handleAnswerPage5(answer) {
             }
         });
 
-        if (chancesA1 === 0) {
-            showGameOver("adventure1");
+        if (chances === 0) {
+            alert('Você atingiu o número máximo de chances. Voltando para a tela inicial.');
+            chances = 3; // Reseta as chances
+            goBackToAdventure(); // Volta para a tela inicial
         }
-        
     } else if (answer === 'correct') {
-        correctAnsweredPagesA1.add(currentPage); // Marca a página como respondida corretamente
+        correctAnsweredPages.add(currentPage); // Marca a página como respondida corretamente
         messageContainer.innerHTML = `
             <p>Resposta correta!</p>
             <p>A tempestade teria abafado o som. Ela pode estar escondendo algo.</p>
@@ -143,12 +163,11 @@ function handleAnswerPage5(answer) {
     }
 }
 
-// Função para lidar com a resposta da página 6
 function handleAnswerPage6(answer) {
-    const currentPage = 'adventure1-page-6';
+    const currentPage = 'adventure1-page-6'; // Corrigido para a página 6
 
     // Se a página já foi respondida corretamente, não faz mais nada
-    if (correctAnsweredPagesA1.has(currentPage)) return;
+    if (correctAnsweredPages.has(currentPage)) return;
 
     const messageContainer = document.createElement('div');
     messageContainer.style.marginTop = '20px';
@@ -168,8 +187,8 @@ function handleAnswerPage6(answer) {
     });
 
     if (answer === 'wrong') {
-        chancesA1 --; // Reduz uma chance
-        messageContainer.innerHTML = `<p>Resposta errada!</p><p>Você perdeu uma chance. Restam ${chancesA1} chances.</p>`;
+        chances--; // Reduz uma chance
+        messageContainer.innerHTML = `<p>Resposta errada!</p><p>Você perdeu uma chance. Restam ${chances} chances.</p>`;
         document.getElementById(currentPage).appendChild(messageContainer);
 
         // Marca o botão errado como vermelho
@@ -179,15 +198,16 @@ function handleAnswerPage6(answer) {
             }
         });
 
-        if (chancesA1 === 0) {
-            showGameOver("adventure1");
-        }        
-    
+        if (chances === 0) {
+            alert('Você atingiu o número máximo de chances. Voltando para a tela inicial.');
+            chances = 3; // Reseta as chances
+            goBackToAdventure(); // Volta para a tela inicial
+        }
     } else if (answer === 'correct') {
-        correctAnsweredPagesA1.add(currentPage); // Marca a página como respondida corretamente
+        correctAnsweredPages.add(currentPage); // Marca a página como respondida corretamente
         messageContainer.innerHTML = `
             <p>Resposta correta!</p>
-            <p>Alguém já havia pegado o punhal antes do crime acontecer.</p>
+            <p>A tempestade teria abafado o som. Ela pode estar escondendo algo.</p>
         `;
         document.getElementById(currentPage).appendChild(messageContainer);
 
@@ -221,12 +241,11 @@ function handleAnswerPage6(answer) {
     }
 }
 
-// Função para lidar com a resposta da página 7
 function handleAnswerPage7(answer) {
-    const currentPage = 'adventure1-page-7';
+    const currentPage = 'adventure1-page-7'; // Corrigido para a página 7
 
     // Se a página já foi respondida corretamente, não faz mais nada
-    if (correctAnsweredPagesA1.has(currentPage)) return;
+    if (correctAnsweredPages.has(currentPage)) return;
 
     const messageContainer = document.createElement('div');
     messageContainer.style.marginTop = '20px';
@@ -246,31 +265,33 @@ function handleAnswerPage7(answer) {
     });
 
     if (answer === 'wrong') {
-        chancesA1--; // Reduz uma chance
-        messageContainer.innerHTML = `<p>Resposta errada!</p><p>Você perdeu uma chance. Restam ${chancesA1} chances.</p>`;
+        chances--; // Reduz uma chance
+        messageContainer.innerHTML = `<p>Resposta errada!</p><p>Você perdeu uma chance. Restam ${chances} chances.</p>`;
         document.getElementById(currentPage).appendChild(messageContainer);
 
         // Marca o botão errado como vermelho
         questionButtons.forEach((button) => {
-            if (button.innerText.startsWith('A)')) {
+            if (button.innerText.startsWith('B)')) {
                 button.classList.add('wrong');
             }
         });
-        
-        if (chancesA1 === 0) {
-            showGameOver("adventure1");
+
+        if (chances === 0) {
+            alert('Você atingiu o número máximo de chances. Voltando para a tela inicial.');
+            chances = 3; // Reseta as chances
+            goBackToAdventure(); // Volta para a tela inicial
         }
-        
     } else if (answer === 'correct') {
-        correctAnsweredPagesA1.add(currentPage); // Marca a página como respondida corretamente
-        messageContainer.innerHTML = 
-        `<p>Resposta correta!</p>
-        <p>A herança era o motivo.</p>`;
+        correctAnsweredPages.add(currentPage); // Marca a página como respondida corretamente
+        messageContainer.innerHTML = `
+            <p>Resposta correta!</p>
+            <p>A tempestade teria abafado o som. Ela pode estar escondendo algo.</p>
+        `;
         document.getElementById(currentPage).appendChild(messageContainer);
 
         // Marca o botão correto como verde
         questionButtons.forEach((button) => {
-            if (button.innerText.startsWith('B)')) {
+            if (button.innerText.startsWith('A)')) {
                 button.classList.add('correct');
             }
         });
@@ -297,13 +318,11 @@ function handleAnswerPage7(answer) {
         }, 5000);
     }
 }
-
-// Função para lidar com a resposta da página 9
 function handleAnswerPage9(answer) {
     const currentPage = 'adventure1-page-9';
 
     // Se a página já foi respondida corretamente, não faz mais nada
-    if (correctAnsweredPagesA1.has(currentPage)) return;
+    if (correctAnsweredPages.has(currentPage)) return;
 
     const messageContainer = document.createElement('div');
     messageContainer.style.marginTop = '20px';
@@ -323,8 +342,8 @@ function handleAnswerPage9(answer) {
     });
 
     if (answer === 'wrong') {
-        chancesA1--; // Reduz uma chance
-        messageContainer.innerHTML = `<p>Resposta errada!</p><p>Você perdeu uma chance. Restam ${chancesA1} chances.</p>`;
+        chances--; // Reduz uma chance
+        messageContainer.innerHTML = `<p>Resposta errada!</p><p>Você perdeu uma chance. Restam ${chances} chances.</p>`;
         document.getElementById(currentPage).appendChild(messageContainer);
 
         // Marca o botão errado como vermelho
@@ -334,15 +353,17 @@ function handleAnswerPage9(answer) {
             }
         });
 
-        if (chancesA1 === 0) {
-            showGameOver("adventure1");
+        if (chances === 0) {
+            alert('Você atingiu o número máximo de chances. Voltando para a tela inicial.');
+            chances = 3; // Reseta as chances
+            goBackToAdventure(); // Volta para a tela inicial
         }
-
     } else if (answer === 'correct') {
-        correctAnsweredPagesA1.add(currentPage); // Marca a página como respondida corretamente
-        messageContainer.innerHTML = 
-        `<p>Resposta correta!</p>
-        <p>O verdadeiro assassino é o Sr. Graves! Ele queria a herança e tramou tudo para incriminar a governanta.</p>`;
+        correctAnsweredPages.add(currentPage); // Marca a página como respondida corretamente
+        messageContainer.innerHTML = `
+            <p>Resposta correta!</p>
+            <p>O Sr. Graves é o culpado, com base nas pistas que foram encontradas.</p>
+        `;
         document.getElementById(currentPage).appendChild(messageContainer);
 
         // Marca o botão correto como verde
